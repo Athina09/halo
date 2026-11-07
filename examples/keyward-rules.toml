@@ -1,0 +1,44 @@
+# Keyward rules for Halo. Copy to ~/keyward/rules.toml (or ~/.keyward/rules.toml) and replace
+# 123456789012345 with YOUR WhatsApp Phone number ID, and 919876543210 with your own number.
+# Anything not listed here is refused. There is deliberately NO "ai" route: the model is local.
+
+[broker]
+host = "127.0.0.1"
+port = 8787
+pass_ttl_max = 900
+pass_uses_max = 50
+
+# Keyward asks you YES/NO on WhatsApp for risky actions. Halo's routes cannot spend money,
+# so this only matters if you add a route that needs approval later.
+[approvals]
+channel = "whatsapp"
+timeout = 300
+
+[approvals.whatsapp]
+route = "whatsapp"
+path = "/v21.0/123456789012345/messages"
+owner = "919876543210"
+app_secret = "WHATSAPP_APP_SECRET"
+
+# Halo may send messages from ONE phone number ID, and nothing else on Meta's API.
+[routes.whatsapp]
+upstream = "https://graph.facebook.com"
+secret = "WHATSAPP_TOKEN"
+inject = { header = "Authorization", format = "Bearer {secret}" }
+allow = [{ method = "POST", path = "^/v[0-9.]+/123456789012345/messages$" }]
+limits = { per_minute = 20, per_day = 300 }
+
+# Is this webhook really from WhatsApp? Halo asks Keyward and never holds the app secret.
+[verifiers.whatsapp]
+secret = "WHATSAPP_APP_SECRET"
+prefix = "sha256="
+
+# Phone calls (phase 4). Store the Twilio credentials as ONE secret, "AccountSID:AuthToken":
+#   keyward set TWILIO_CREDENTIALS
+# Halo may only start calls from your account (replace ACxxxxxxxx), at most 10 a day.
+[routes.twilio]
+upstream = "https://api.twilio.com"
+secret = "TWILIO_CREDENTIALS"
+inject = { header = "Authorization", format = "Basic {secret_base64}" }
+allow = [{ method = "POST", path = "^/2010-04-01/Accounts/ACxxxxxxxx/Calls\\.json$" }]
+limits = { per_minute = 2, per_day = 10 }
