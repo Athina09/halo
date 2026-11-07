@@ -24,7 +24,7 @@ Your WhatsApp ──► Meta ──► cloudflared ──► Halo ──► Olla
 - A Mac or PC. **RAM:** 8 GB runs a 3B model slowly. 16 GB is comfortable. (A 3B model uses about 2 to 3 GB.)
 - Python 3.11 or newer
 - Ollama: https://ollama.com
-- Keyward (the repo at `~/keyward`): `pip install -e ~/keyward`
+- Keyward (the broker): `git clone https://github.com/Athina09/Keyward ~/keyward && pip install -e ~/keyward`
 - cloudflared: `brew install cloudflared` (a free tunnel so Meta can reach your laptop)
 - A free Meta developer account with a WhatsApp test number
 
